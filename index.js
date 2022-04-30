@@ -1,8 +1,8 @@
 const { table } = require("console");
 const mysql = require("mysql2");
-const {prompt} = require("inquirer");
-const db = require("./db");
-require("console.table");
+const { prompt } = require("inquirer");
+// const db = require("./db");
+// require("console.table");
 
 // Create db connection 
 const connection = mysql.createConnection(
@@ -15,9 +15,8 @@ const connection = mysql.createConnection(
     console.log(`Connected to the employees database.`)
 );
 
-
 // Error handling for messed up connection
-connection.connect(function(err) {
+connection.connect(function (err) {
     if (err) throw err;
 });
 
@@ -25,7 +24,7 @@ connection.connect(function(err) {
 function mainMenu() {
     prompt([
         {
-            type: "List",
+            type: "list",
             name: "choice",
             message: "What would you like to do?",
             choices: [
@@ -66,18 +65,18 @@ function mainMenu() {
         if (choices == "VIEW_EMPLOYEES") {
             //call function
             viewEmployees();
-        } else if(choices == "VIEW_DEPARTMENTS") {
+        } else if (choices == "VIEW_DEPARTMENTS") {
             //call function
             viewDeparments()
-        } else if(choices == "VIEW_ROLES") {
+        } else if (choices == "VIEW_ROLES") {
             viewRoles()
-        } else if(choices == "ADD_EMPLOYEE") {
+        } else if (choices == "ADD_EMPLOYEE") {
             //call function
             addEmployee()
-        } else if(choices == "ADD_DEPARTMENT") {
+        } else if (choices == "ADD_DEPARTMENT") {
             //call function
             addDepartment()
-        } else if(choices == "UPDATE_ROLE") {
+        } else if (choices == "UPDATE_ROLE") {
             //call function
             updateRole()
         } else if (choices == "QUIT") {
@@ -87,65 +86,84 @@ function mainMenu() {
     })
 }
 
+// View employees
 function viewEmployees() {
-    db.findAllEmployees()
-    .then(([rows]) => {
-        let employees = rows; 
-        console.log("\n");
-        console.table(employees)
-    })
-    .then(() => mainMenu())
+    connection.findAllEmployees()
+        .then(([rows]) => {
+            let employees = rows;
+            console.log("\n");
+            console.table(employees)
+        })
+        .then(() => mainMenu())
 }
-
+// View departments
 function viewDeparments() {
-    db.findAllDepartments()
-    .then(([rows]) => {
-        let Departments = rows; 
-        console.log("\n");
-        console.table(Departments)
-    })
-    .then(() => mainMenu())
+    connection.findAllDepartments()
+        .then(([rows]) => {
+            let Departments = rows;
+            console.log("\n");
+            console.table(Departments)
+        })
+        .then(() => mainMenu())
 }
-
+// View roles
 function viewRoles() {
-    db.findAllRoles()
-    .then(([rows]) => {
-        let roles = rows; 
-        console.log("\n");
-        console.table(roles)
-    })
-    .then(() => mainMenu())
+    connection.findAllRoles()
+        .then(([rows]) => {
+            let roles = rows;
+            console.log("\n");
+            console.table(roles)
+        })
+        .then(() => mainMenu())
 }
 
+// Add an emploee
 function addEmployee() {
     prompt([
-    {
-        type: "input",
-        name: "firstName",
-        message: "What is the employees first name?"
-    },
-    {
-        type: "input",
-        name: "lastName",
-        message: "What is the employees last name?"
-    },
-    {
-        type: "input",
-        name: "employeeRole",
-        message: "What is the employees role?"
-    },
-    {
-        type: "input",
-        name: "employeeManager",
-        message: "Who is the employees manager??"
-    }
+        {
+            type: "input",
+            name: "firstName",
+            message: "What is the employees first name?"
+        },
+        {
+            type: "input",
+            name: "lastName",
+            message: "What is the employees last name?"
+        },
+        {
+            type: "input",
+            name: "employeeRole",
+            message: "What is the employees role?"
+        },
+        {
+            type: "input",
+            name: "employeeManager",
+            message: "Who is the employees manager?"
+        }
     ])
-    .then (res => {
-        let answers = res.name
-    })
-    
+        .then(res => {
+            let answers = res.name
+            console.log(answers);
+            const sql =
+                `INSERT INTO employees
+        (first_name, last_name, role_id)
+        VALUES
+        (${answers.first_name}, ${answers.last_name}, ${answers.role_id})`
+
+            connection.query(sql, (err, res) => {
+                if (err) {
+                    res.status(400).json({ error: err.message });
+                    return;
+                }
+                res.json({
+                    message: 'success',
+                    data: body
+                });
+            });
+        })
 }
 
+// Add a department
 function addDepartment() {
     prompt([
         {
@@ -154,6 +172,26 @@ function addDepartment() {
             message: "What is the name of the department?"
         }
     ])
+        .then(res => {
+            let answers = res.name
+            console.log(answers);
+            const sql =
+                `INSERT INTO department
+        (name)
+        VALUES
+        (${answers.name})`
+
+        connection.query(sql, (err, res) => {
+                if (err) {
+                    res.status(400).json({ error: err.message });
+                    return;
+                }
+                res.json({
+                    message: 'success',
+                    data: body
+                });
+            });
+        })
 
 }
 
@@ -166,6 +204,26 @@ function updateRole() {
             choices: []
         }
     ])
+        .then(res => {
+            const sql = `UPDATE employee SET employee = ? WHERE id = ?`;
+            let answers = res.name
+
+            connection.query(sql, (err, result) => {
+                if (err) {
+                    res.status(400).json({ error: err.message });
+                } else if (!result.affectedRows) {
+                    res.json({
+                        message: 'Employee not found'
+                    });
+                } else {
+                    res.json({
+                        message: 'success',
+                        data: answers,
+                        changes: result.affectedRows
+                    });
+                }
+            });
+        })
 }
 
 function quit() {
