@@ -42,12 +42,16 @@ function mainMenu() {
                     value: "VIEW_ROLES"
                 },
                 {
-                    name: "Add An Employee",
+                    name: "Add A New Employee",
                     value: "ADD_EMPLOYEE"
                 },
                 {
-                    name: "Add A Department",
+                    name: "Add A New Department",
                     value: "ADD_DEPARTMENT"
+                },
+                {
+                    name: "Add A New Role",
+                    value: "ADD_Role"
                 },
                 {
                     name: "Update An Employee Role",
@@ -79,6 +83,9 @@ function mainMenu() {
                     break;
                 case "ADD_DEPARTMENT":
                     addDepartment();
+                    break;
+                case "ADD_ROLE":
+                    addRole();
                     break;
                 case "UPDATE_ROLE":
                     updateRole();
@@ -137,6 +144,13 @@ function addEmployee() {
         if (err) {
             console.log(err);
         }
+        // let obj = Object.getOwnPropertyNames(res);
+        // console.log(obj);
+        // let roleTitle = JSON.stringify(res[0].title);
+        // console.log(roleTitle);
+        // res.map((roles) => {
+        //     return {name: roles.title}
+        // })
     })
     prompt([
         {
@@ -153,13 +167,13 @@ function addEmployee() {
             type: "list",
             name: "employeeRole",
             message: "What is the employees role?",
-            choices: roles.map((roles) => { return {name: roles.title} })
+            choices: ''
         }
     ])
         .then(res => {
-            let employee = res.department
-            console.log(res.employee);
-            connection.query(`INSERT INTO department (name) VALUES ("${employee}")`, (err, res) => {
+            // let employee = res;
+            // console.log(res);
+            connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES (${res.firstName}, ${res.lastName}, ${res.employeeRole})`, (err, res) => {
                 if (err) {
                     console.log(err);
                 }
@@ -198,6 +212,39 @@ function addDepartment() {
         })
 }
 
+function addRole() {
+    prompt([
+        {
+            type: "input",
+            name: "roleName",
+            message: "What is the name of the role?"
+        },
+        {
+            type: "input",
+            name: "roleSalary",
+            message: "What is the salary of the role?"
+        },
+        {
+            type: "list",
+            name: "roleDepartment",
+            message: "What department does this role belong to?",
+            choices: ''
+        }
+    ])
+        .then(res => {
+            connection.query(`INSERT INTO role (title, salary, departrment_id) VALUES ("${res.roleName}", ${res.roleSalary}, ${res.roleDepartment})`, (err, res) => {
+                if (err) {
+                    console.log(err);
+                }
+                console.log("\n");
+                console.log('New role was added!');
+                console.log(res);
+                console.log("\n");
+                mainMenu();
+            });
+        })
+}
+
 function updateRole() {
     prompt([
         {
@@ -208,23 +255,15 @@ function updateRole() {
         }
     ])
         .then(res => {
-            const sql = `UPDATE employee SET employee = ? WHERE id = ?`;
-            let answers = res.name
-
-            connection.query(sql, (err, result) => {
+            connection.query(`UPDATE role SET () WHERE ()`, (err, res) => {
                 if (err) {
-                    res.status(400).json({ error: err.message });
-                } else if (!result.affectedRows) {
-                    res.json({
-                        message: 'Employee not found'
-                    });
-                } else {
-                    res.json({
-                        message: 'success',
-                        data: answers,
-                        changes: result.affectedRows
-                    });
+                    console.log(err);
                 }
+                console.log("\n");
+                console.log('New employee was added!');
+                console.log(res);
+                console.log("\n");
+                mainMenu();
             });
         })
 }
@@ -233,5 +272,5 @@ function quit() {
     console.log("Goodbye!");
     connection.end();
 }
-
+// Call function to start Tracker
 mainMenu();
