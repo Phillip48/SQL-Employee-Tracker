@@ -1,6 +1,7 @@
-const { table } = require("console");
+// const { table } = require("console");
 const mysql = require("mysql2");
 const { prompt } = require("inquirer");
+// const { resolveObjectURL } = require("buffer");
 // const db = require("./db");
 // require("console.table");
 
@@ -58,67 +59,85 @@ function mainMenu() {
                 }
             ]
         }
-    ]).then(res => {
-        //call function dpeending on what the user chooses
-        // if conditional or switch case or when
-        let choices = res.choices;
-        if (choices == "VIEW_EMPLOYEES") {
-            //call function
-            viewEmployees();
-        } else if (choices == "VIEW_DEPARTMENTS") {
-            //call function
-            viewDeparments()
-        } else if (choices == "VIEW_ROLES") {
-            viewRoles()
-        } else if (choices == "ADD_EMPLOYEE") {
-            //call function
-            addEmployee()
-        } else if (choices == "ADD_DEPARTMENT") {
-            //call function
-            addDepartment()
-        } else if (choices == "UPDATE_ROLE") {
-            //call function
-            updateRole()
-        } else if (choices == "QUIT") {
-            quit();
-        }
-
-    })
+    ])
+        .then(data => {
+            //call function dpeending on what the user chooses
+            // if conditional or switch case or when
+            // let choices = data.choices;
+            switch (data.choice) {
+                case "VIEW_EMPLOYEES":
+                    viewEmployees();
+                    break;
+                case "VIEW_DEPARTMENTS":
+                    viewDeparments();
+                    break;
+                case "VIEW_ROLES":
+                    viewRoles();
+                    break;
+                case "ADD_EMPLOYEE":
+                    addEmployee();
+                    break;
+                case "ADD_DEPARTMENT":
+                    addDepartment();
+                    break;
+                case "UPDATE_ROLE":
+                    updateRole();
+                    break;
+                default: quit();
+            }
+        })
 }
 
 // View employees
 function viewEmployees() {
-    connection.findAllEmployees()
-        .then(([rows]) => {
-            let employees = rows;
-            console.log("\n");
-            console.table(employees)
-        })
-        .then(() => mainMenu())
+    connection.query(
+        `SELECT * FROM employees.employee`, (err, results) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log("\n")
+            console.table(results);
+            console.log("\n")
+            mainMenu();
+        }
+    )
 }
 // View departments
 function viewDeparments() {
-    connection.findAllDepartments()
-        .then(([rows]) => {
-            let Departments = rows;
-            console.log("\n");
-            console.table(Departments)
-        })
-        .then(() => mainMenu())
+    connection.query(
+        `SELECT * FROM employees.department`, (err, results) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log("\n")
+            console.table(results);
+            console.log("\n")
+            mainMenu();
+        }
+    )
 }
 // View roles
 function viewRoles() {
-    connection.findAllRoles()
-        .then(([rows]) => {
-            let roles = rows;
-            console.log("\n");
-            console.table(roles)
-        })
-        .then(() => mainMenu())
+    connection.query(
+        `SELECT * FROM employees.role`, (err, results) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log("\n")
+            console.table(results);
+            console.log("\n")
+            mainMenu();
+        }
+    )
 }
 
 // Add an emploee
 function addEmployee() {
+    let roles = connection.query(`SELECT * FROM employees.role`, (err, res) => {
+        if (err) {
+            console.log(err);
+        }
+    })
     prompt([
         {
             type: "input",
@@ -131,36 +150,27 @@ function addEmployee() {
             message: "What is the employees last name?"
         },
         {
-            type: "input",
+            type: "list",
             name: "employeeRole",
-            message: "What is the employees role?"
-        },
-        {
-            type: "input",
-            name: "employeeManager",
-            message: "Who is the employees manager?"
+            message: "What is the employees role?",
+            choices: roles.map((roles) => { return {name: roles.title} })
         }
     ])
         .then(res => {
-            let answers = res.name
-            console.log(answers);
-            const sql =
-                `INSERT INTO employees
-        (first_name, last_name, role_id)
-        VALUES
-        (${answers.first_name}, ${answers.last_name}, ${answers.role_id})`
-
-            connection.query(sql, (err, res) => {
+            let employee = res.department
+            console.log(res.employee);
+            connection.query(`INSERT INTO department (name) VALUES ("${employee}")`, (err, res) => {
                 if (err) {
-                    res.status(400).json({ error: err.message });
-                    return;
+                    console.log(err);
                 }
-                res.json({
-                    message: 'success',
-                    data: body
-                });
+                console.log("\n");
+                console.log('New employee was added!');
+                console.log(res);
+                console.log("\n");
+                mainMenu();
             });
         })
+
 }
 
 // Add a department
@@ -173,26 +183,19 @@ function addDepartment() {
         }
     ])
         .then(res => {
-            let answers = res.name
-            console.log(answers);
-            const sql =
-                `INSERT INTO department
-        (name)
-        VALUES
-        (${answers.name})`
-
-        connection.query(sql, (err, res) => {
+            let department = res.department
+            console.log(res.department);
+            connection.query(`INSERT INTO department (name) VALUES ("${department}")`, (err, res) => {
                 if (err) {
-                    res.status(400).json({ error: err.message });
-                    return;
+                    console.log(err);
                 }
-                res.json({
-                    message: 'success',
-                    data: body
-                });
+                console.log("\n");
+                console.log('New department was made!');
+                console.log(res);
+                console.log("\n");
+                mainMenu();
             });
         })
-
 }
 
 function updateRole() {
@@ -228,7 +231,7 @@ function updateRole() {
 
 function quit() {
     console.log("Goodbye!");
-    process.quit();
+    connection.end();
 }
 
 mainMenu();
