@@ -313,20 +313,6 @@ function updateRole() {
 
 }
 
-// const employeeRole = function () {
-//     let employeeRoles = connection.query(`SELECT * FROM employees.role`, (err, res) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//         res.map(() => {
-//             return {
-//                 name: employeeRoles.title,
-//                 value: employeeRoles.department_id
-//             }
-//         })
-//     })
-// }
-
 function quit() {
     console.log("Goodbye!");
     connection.end();
