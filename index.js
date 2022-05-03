@@ -51,7 +51,7 @@ function mainMenu() {
                 },
                 {
                     name: "Add A New Role",
-                    value: "ADD_Role"
+                    value: "ADD_ROLE"
                 },
                 {
                     name: "Update An Employee Role",
@@ -151,40 +151,52 @@ function addEmployee() {
         // res.map((roles) => {
         //     return {name: roles.title}
         // })
-    })
-    prompt([
-        {
-            type: "input",
-            name: "firstName",
-            message: "What is the employees first name?"
-        },
-        {
-            type: "input",
-            name: "lastName",
-            message: "What is the employees last name?"
-        },
-        {
-            type: "list",
-            name: "employeeRole",
-            message: "What is the employees role?",
-            choices: ''
-        }
-    ])
-        .then(res => {
-            // let employee = res;
-            // console.log(res);
-            connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES (${res.firstName}, ${res.lastName}, ${res.employeeRole})`, (err, res) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log("\n");
-                console.log('New employee was added!');
-                console.log(res);
-                console.log("\n");
-                mainMenu();
-            });
-        })
 
+        prompt([
+            {
+                type: "input",
+                name: "firstName",
+                message: "What is the employees first name?"
+            },
+            {
+                type: "input",
+                name: "lastName",
+                message: "What is the employees last name?"
+            },
+            {
+                type: "list",
+                name: "employeeRole",
+                message: "What is the employees role?",
+                choices:
+                    res.map((roles) => {
+                        return {
+                            name: roles.title,
+                            value: roles.id
+                        }
+                    })
+                // res.map(roles => {
+                //     for (let i = 0; i < roles.length; i++) {
+                //         roles.title[i];
+
+                //     }
+                // })
+            }
+        ])
+            .then(res => {
+                // let employee = res.employeeRole;
+                // console.log(res);
+                // console.log(res.employeeRole.value);
+                connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ("${res.firstName}", "${res.lastName}", ${res.employeeRole})`, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log("\n");
+                    console.log('New employee was added!');
+                    console.log("\n");
+                    mainMenu();
+                });
+            })
+    })
 }
 
 // Add a department
@@ -213,60 +225,107 @@ function addDepartment() {
 }
 
 function addRole() {
-    prompt([
-        {
-            type: "input",
-            name: "roleName",
-            message: "What is the name of the role?"
-        },
-        {
-            type: "input",
-            name: "roleSalary",
-            message: "What is the salary of the role?"
-        },
-        {
-            type: "list",
-            name: "roleDepartment",
-            message: "What department does this role belong to?",
-            choices: ''
+    let departments = connection.query(`SELECT * FROM employees.department`, (err, res) => {
+        if (err) {
+            console.log(err);
         }
-    ])
-        .then(res => {
-            connection.query(`INSERT INTO role (title, salary, departrment_id) VALUES ("${res.roleName}", ${res.roleSalary}, ${res.roleDepartment})`, (err, res) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log("\n");
-                console.log('New role was added!');
-                console.log(res);
-                console.log("\n");
-                mainMenu();
-            });
-        })
+        prompt([
+            {
+                type: "input",
+                name: "roleName",
+                message: "What is the name of the role?"
+            },
+            {
+                type: "input",
+                name: "roleSalary",
+                message: "What is the salary of the role?"
+            },
+            {
+                type: "list",
+                name: "roleDepartment",
+                message: "What department does this role belong to?",
+                choices:
+                    res.map((departments) => {
+                        return {
+                            name: departments.name,
+                            value: departments.id
+                        }
+                    })
+            }
+        ])
+            .then(res => {
+                connection.query(`INSERT INTO role (title, salary, department_id) VALUES ("${res.roleName}", ${res.roleSalary}, ${res.roleDepartment})`, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log("\n");
+                    console.log('New role was added!');
+                    console.log("\n");
+                    mainMenu();
+                });
+            })
+    })
 }
 
 function updateRole() {
-    prompt([
-        {
-            type: "list",
-            name: "update",
-            message: "Which employees role would you like to update??",
-            choices: []
+    let update = connection.query(`SELECT employee.first_name AS firstname, employee.last_name AS lastname, employee.id AS employeeID, employee.role_id AS empRole, role.title AS role FROM employee JOIN role ON employee.role_id = role.id`, (err, res) => {
+        if (err) {
+            console.log(err);
         }
-    ])
-        .then(res => {
-            connection.query(`UPDATE role SET () WHERE ()`, (err, res) => {
-                if (err) {
-                    console.log(err);
-                }
-                console.log("\n");
-                console.log('New employee was added!');
-                console.log(res);
-                console.log("\n");
-                mainMenu();
-            });
-        })
+        prompt([
+            {
+                type: "list",
+                name: "updateName",
+                message: "Which employees role would you like to update?",
+                choices:
+                    res.map((update) => {
+                        return {
+                            name: `${update.firstname} ${update.lastname}`,
+                            value: `${update.employeeID}`
+                        }
+                    })
+            },
+            {
+                type: "list",
+                name: "newRole",
+                message: "Which role would you like to give this employee?",
+                choices:
+                    res.map((update) => {
+                        return {
+                            name: `${update.role}`,
+                            value: `${update.empRole}`
+                        }
+                    })
+            }
+        ])
+            .then(res => {
+                connection.query(`UPDATE employee SET role_id = ${res.newRole} WHERE id = ${res.updateName};`, (err, res) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log("\n");
+                    console.log('Employee role was updated!');
+                    console.log("\n");
+                    mainMenu();
+                });
+            })
+    })
+
 }
+
+// const employeeRole = function () {
+//     let employeeRoles = connection.query(`SELECT * FROM employees.role`, (err, res) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.map(() => {
+//             return {
+//                 name: employeeRoles.title,
+//                 value: employeeRoles.department_id
+//             }
+//         })
+//     })
+// }
 
 function quit() {
     console.log("Goodbye!");
