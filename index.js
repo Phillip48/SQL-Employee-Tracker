@@ -145,13 +145,6 @@ function addEmployee() {
         if (err) {
             console.log(err);
         }
-        // let obj = Object.getOwnPropertyNames(res);
-        // console.log(obj);
-        // let roleTitle = JSON.stringify(res[0].title);
-        // console.log(roleTitle);
-        // res.map((roles) => {
-        //     return {name: roles.title}
-        // })
 
         prompt([
             {
@@ -175,12 +168,6 @@ function addEmployee() {
                             value: roles.id
                         }
                     })
-                // res.map(roles => {
-                //     for (let i = 0; i < roles.length; i++) {
-                //         roles.title[i];
-
-                //     }
-                // })
             }
         ])
             .then(res => {
@@ -268,7 +255,9 @@ function addRole() {
 }
 
 function updateRole() {
-    let update = connection.query(`SELECT employee.first_name AS firstname, employee.last_name AS lastname, employee.id AS employeeID, employee.role_id AS empRole, role.title AS role FROM employee JOIN role ON employee.role_id = role.id`, (err, res) => {
+    let update = connection.query(
+        `SELECT employee.first_name AS firstname, employee.last_name AS lastname, employee.id AS employeeID, employee.role_id AS empRole, role.title AS role 
+        FROM role JOIN employee ON employee.role_id = role.id`, (err, res) => {
         if (err) {
             console.log(err);
         }
