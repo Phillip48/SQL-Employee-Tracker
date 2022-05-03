@@ -10,18 +10,22 @@
 -[Contributors](#Contributors)  
 
 ## Description  
-
+```md
+AS A business owner
+I WANT to be able to view and manage the departments, roles, and employees in my company
+SO THAT I can organize and plan my business
+```
 [Video Link]()
 
 ## Images  
-![Img 1](/assests/img/et1.png) 
+![Img 1](/assests/img/et1.png)  
 Image of the different options  
 ![Img 2](/assests/img/nt2.png)  
-Image of making a new department
-![Img 3](/assests/img/et3.png) 
-Image of adding a new employee
+Image of making a new department  
+![Img 3](/assests/img/et3.png)  
+Image of adding a new employee  
 ![Img 4](/assests/img/et4.png)  
-Image of viewing all employees
+Image of viewing all employees  
 
 ## Installation     
 `git clone git@github.com:Phillip48/SQL-Employee-Tracker.git`  
