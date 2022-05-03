@@ -10,16 +10,18 @@
 -[Contributors](#Contributors)  
 
 ## Description  
-Type here 
+
 [Video Link]()
 
 ## Images  
-![Img 1]() 
-  
-![Img 2]()  
-  
-![Img 3]() 
-   
+![Img 1](/assests/img/et1.png) 
+Image of the different options  
+![Img 2](/assests/img/nt2.png)  
+Image of making a new department
+![Img 3](/assests/img/et3.png) 
+Image of adding a new employee
+![Img 4](/assests/img/et4.png)  
+Image of viewing all employees
 
 ## Installation     
 `git clone git@github.com:Phillip48/SQL-Employee-Tracker.git`  

@@ -23,6 +23,7 @@ connection.connect(function (err) {
 
 
 function mainMenu() {
+    console.log("Welcome to Employee Tracker!");
     prompt([
         {
             type: "list",
@@ -217,7 +218,6 @@ function addDepartment() {
                 }
                 console.log("\n");
                 console.log('New department was made!');
-                console.log(res);
                 console.log("\n");
                 mainMenu();
             });
