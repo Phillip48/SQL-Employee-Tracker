@@ -257,7 +257,7 @@ function addRole() {
 function updateRole() {
     let update = connection.query(
         `SELECT employee.first_name AS firstname, employee.last_name AS lastname, employee.id AS employeeID, employee.role_id AS empRole, role.title AS role 
-        FROM role JOIN employee ON employee.role_id = role.id`, (err, res) => {
+        FROM role RIGHT JOIN employee ON employee.role_id = role.id`, (err, res) => {
         if (err) {
             console.log(err);
         }
